@@ -378,22 +378,8 @@
       justify-content: flex-end;
     }
 
-    .ghost-button:disabled {
-      cursor: wait;
-      opacity: 0.58;
-    }
-
-    .route-button.is-disabled {
-      cursor: default;
-      opacity: 0.58;
-    }
-
-    .location-status {
-      min-height: 18px;
-      margin: 8px 0 0;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
+    .map-actions > * {
+      flex: 0 0 auto;
     }
 
     .map-wrap {
@@ -522,13 +508,18 @@
       }
 
       .map-header {
-        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-columns: 1fr;
         gap: 8px;
         padding: 12px 16px;
       }
 
       .map-actions {
-        justify-content: flex-end;
+        width: 100%;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 2px;
+        -webkit-overflow-scrolling: touch;
       }
 
       .selected-label {
@@ -591,6 +582,16 @@
         padding: 10px 14px;
       }
 
+      .map-actions {
+        gap: 6px;
+      }
+
+      .map-actions .ghost-button,
+      .map-actions .map-button {
+        min-width: max-content;
+        padding-inline: 10px;
+      }
+
       .selected-title {
         font-size: 17px;
       }
@@ -651,6 +652,7 @@
       }
 
       .map-header {
+        grid-template-columns: 1fr;
         padding: 10px 14px;
       }
     }
@@ -697,13 +699,9 @@
           <p class="selected-label">目前地點</p>
           <h2 id="selectedTitle" class="selected-title">福岡美食</h2>
           <div id="selectedMeta" class="selected-meta"></div>
-          <p id="locationStatus" class="location-status" aria-live="polite">尚未定位</p>
         </div>
         <div class="map-actions">
-          <button id="locateButton" class="ghost-button" type="button">取得定位</button>
-          <a id="routeButton" class="ghost-button route-button is-disabled" href="#" target="_blank" rel="noreferrer" aria-disabled="true">導航到單店</a>
-          <a id="myMapButton" class="ghost-button" href="https://www.google.com/maps/d/u/0/edit?mid=1PTervfGhBAEzoJx-bLv-56j9pBFSHh8&usp=sharing" target="_blank" rel="noreferrer">全部標記</a>
-          <a id="openMapButton" class="map-button" href="https://www.google.com/maps/search/?api=1&query=%E7%A6%8F%E5%B2%A1%20%E7%BE%8E%E9%A3%9F" target="_blank" rel="noreferrer">單店地圖</a>
+          <a id="myMapButton" class="map-button" href="https://www.google.com/maps/d/u/0/edit?mid=1PTervfGhBAEzoJx-bLv-56j9pBFSHh8&usp=sharing" target="_blank" rel="noreferrer">Google My Maps</a>
         </div>
       </header>
       <div class="map-wrap">
@@ -825,8 +823,7 @@
       category: "all",
       priorityOnly: false,
       search: "",
-      activeId: 0,
-      userLocation: null
+      activeId: 0
     };
     const MY_MAPS_URL = "https://www.google.com/maps/d/u/0/edit?mid=1PTervfGhBAEzoJx-bLv-56j9pBFSHh8&usp=sharing";
     const MAP_ZOOM = 15;
@@ -845,11 +842,7 @@
       categoryChips: document.getElementById("categoryChips"),
       selectedTitle: document.getElementById("selectedTitle"),
       selectedMeta: document.getElementById("selectedMeta"),
-      locationStatus: document.getElementById("locationStatus"),
-      locateButton: document.getElementById("locateButton"),
-      routeButton: document.getElementById("routeButton"),
       myMapButton: document.getElementById("myMapButton"),
-      openMapButton: document.getElementById("openMapButton"),
       mapFrame: document.getElementById("mapFrame")
     };
 
@@ -874,27 +867,6 @@
 
     function getEmbedUrl(item) {
       return `https://www.google.com/maps?q=${encodeURIComponent(getQuery(item))}&z=${MAP_ZOOM}&output=embed`;
-    }
-
-    function getDirectionsUrl(item) {
-      const origin = encodeURIComponent(`${state.userLocation.lat},${state.userLocation.lng}`);
-      const destination = encodeURIComponent(getQuery(item));
-      return `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&travelmode=walking`;
-    }
-
-    function getActiveItem() {
-      return restaurants.find((item) => item.id === state.activeId) || restaurants[0];
-    }
-
-    function updateRouteButton(item = getActiveItem()) {
-      const hasLocation = Boolean(state.userLocation);
-      elements.routeButton.href = hasLocation ? getDirectionsUrl(item) : "#";
-      elements.routeButton.classList.toggle("is-disabled", !hasLocation);
-      elements.routeButton.setAttribute("aria-disabled", hasLocation ? "false" : "true");
-    }
-
-    function setLocationStatus(message) {
-      elements.locationStatus.textContent = message;
     }
 
     function getFilteredItems() {
@@ -964,9 +936,7 @@
         <span class="badge">${escapeHtml(item.category)}</span>
         ${item.priority ? `<span class="badge hot">紅字</span>` : ""}
       `;
-      elements.openMapButton.href = getMapUrl(item);
       elements.mapFrame.src = getEmbedUrl(item);
-      updateRouteButton(item);
       if (!skipListRender) {
         renderCards();
       }
@@ -987,7 +957,6 @@
 
     elements.totalCount.textContent = `${restaurants.length} 家店`;
     elements.myMapButton.href = MY_MAPS_URL;
-    updateRouteButton();
 
     elements.search.addEventListener("input", (event) => {
       state.search = event.target.value;
@@ -999,49 +968,6 @@
       elements.search.value = "";
       renderCards();
       elements.search.focus();
-    });
-
-    elements.locateButton.addEventListener("click", () => {
-      if (!("geolocation" in navigator)) {
-        setLocationStatus("此瀏覽器不支援定位");
-        return;
-      }
-
-      elements.locateButton.disabled = true;
-      setLocationStatus("定位中...");
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude, accuracy } = position.coords;
-          state.userLocation = { lat: latitude, lng: longitude, accuracy };
-          elements.locateButton.disabled = false;
-          elements.locateButton.textContent = "重新定位";
-          const accuracyText = Number.isFinite(accuracy) ? `（約 ${Math.round(accuracy)}m）` : "";
-          setLocationStatus(`已取得定位${accuracyText}`);
-          updateRouteButton();
-        },
-        (error) => {
-          elements.locateButton.disabled = false;
-          const messages = {
-            1: "定位未授權",
-            2: "目前無法取得定位",
-            3: "定位逾時"
-          };
-          setLocationStatus(messages[error.code] || "定位失敗");
-        },
-        {
-          enableHighAccuracy: true,
-          maximumAge: 300000,
-          timeout: 10000
-        }
-      );
-    });
-
-    elements.routeButton.addEventListener("click", (event) => {
-      if (!state.userLocation) {
-        event.preventDefault();
-        setLocationStatus("請先取得定位");
-      }
     });
 
     document.querySelectorAll("[data-tier]").forEach((button) => {
