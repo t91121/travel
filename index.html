@@ -1,0 +1,987 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2026 春福旅行團 福岡｜必吃地圖</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --panel-2: #eef3f7;
+      --ink: #15202b;
+      --muted: #647282;
+      --line: #d8e0e8;
+      --teal: #007d75;
+      --teal-dark: #005e59;
+      --rose: #d9235f;
+      --blue: #2463b6;
+      --amber: #c86f12;
+      --shadow: 0 16px 42px rgba(18, 32, 50, 0.12);
+      --radius: 8px;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "Noto Sans JP", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: minmax(390px, 1fr) minmax(340px, clamp(360px, 38vw, 560px));
+      height: 100vh;
+      height: 100dvh;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      display: flex;
+      min-width: 0;
+      min-height: 0;
+      flex-direction: column;
+      overflow: hidden;
+      border-right: 1px solid var(--line);
+      background: var(--panel);
+    }
+
+    .brand {
+      padding: 24px 24px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--teal);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 26px;
+      line-height: 1.18;
+      letter-spacing: 0;
+    }
+
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .summary span {
+      display: inline-flex;
+      min-height: 30px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: var(--panel-2);
+      white-space: nowrap;
+    }
+
+    .controls {
+      padding: 16px 18px 14px;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfe;
+    }
+
+    .search-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .search-input {
+      width: 100%;
+      min-width: 0;
+      height: 42px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 0 12px;
+      background: var(--panel);
+      color: var(--ink);
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(0, 125, 117, 0.14);
+    }
+
+    .ghost-button,
+    .map-button,
+    .segment-button,
+    .chip-button {
+      display: inline-flex;
+      min-height: 38px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 0 12px;
+      background: var(--panel);
+      color: var(--ink);
+      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .ghost-button:hover,
+    .map-button:hover,
+    .segment-button:hover,
+    .chip-button:hover {
+      border-color: #a9bac9;
+      background: #f7fafc;
+    }
+
+    .map-button {
+      border-color: var(--teal);
+      background: var(--teal);
+      color: #ffffff;
+      font-weight: 800;
+    }
+
+    .map-button:hover {
+      border-color: var(--teal-dark);
+      background: var(--teal-dark);
+    }
+
+    .segments {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    .segment-button {
+      min-width: 0;
+      padding: 0 8px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .segment-button.is-active {
+      border-color: var(--ink);
+      background: var(--ink);
+      color: #ffffff;
+    }
+
+    .chips {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .chip-button {
+      min-height: 34px;
+      font-size: 13px;
+    }
+
+    .chip-button.is-active {
+      border-color: rgba(0, 125, 117, 0.3);
+      background: #dff4f1;
+      color: var(--teal-dark);
+      font-weight: 800;
+    }
+
+    .results-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .list {
+      display: grid;
+      flex: 1;
+      align-content: start;
+      gap: 10px;
+      overflow-y: auto;
+      padding: 14px 14px 22px;
+    }
+
+    .food-card {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 13px;
+      background: var(--panel);
+      box-shadow: 0 1px 0 rgba(18, 32, 50, 0.04);
+      cursor: pointer;
+    }
+
+    .food-card:hover {
+      border-color: #aebdca;
+    }
+
+    .food-card.is-active {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(0, 125, 117, 0.14);
+    }
+
+    .card-top {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.35;
+      letter-spacing: 0;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 9px;
+    }
+
+    .badge {
+      display: inline-flex;
+      min-height: 24px;
+      align-items: center;
+      border-radius: 999px;
+      padding: 3px 8px;
+      background: var(--panel-2);
+      color: #3d4a57;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .badge.tier1 {
+      background: #e1f4f2;
+      color: var(--teal-dark);
+    }
+
+    .badge.tier2 {
+      background: #edf1f8;
+      color: var(--blue);
+    }
+
+    .badge.hot {
+      background: #fde8ef;
+      color: var(--rose);
+    }
+
+    .note {
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .card-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 12px;
+    }
+
+    .card-link {
+      color: var(--teal-dark);
+      font-size: 13px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .card-link:hover {
+      text-decoration: underline;
+    }
+
+    .map-pane {
+      display: grid;
+      min-width: 0;
+      grid-template-rows: auto minmax(0, 1fr);
+      height: 100%;
+      min-height: 0;
+      background: #dfe7ee;
+    }
+
+    .map-header {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: center;
+      border-bottom: 1px solid #c8d3df;
+      padding: 18px 22px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: var(--shadow);
+      z-index: 2;
+    }
+
+    .selected-label {
+      margin: 0 0 4px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .selected-title {
+      margin: 0;
+      overflow-wrap: anywhere;
+      font-size: 22px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    .selected-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 10px;
+    }
+
+    .map-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .map-wrap {
+      position: relative;
+      height: 100%;
+      min-height: 0;
+    }
+
+    iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      border: 0;
+      background: #cfd9e3;
+    }
+
+    .empty-state {
+      border: 1px dashed #b3c1cf;
+      border-radius: var(--radius);
+      padding: 18px;
+      color: var(--muted);
+      background: #f8fafc;
+      text-align: center;
+    }
+
+    @media (max-width: 1180px) and (min-width: 981px) {
+      .app {
+        grid-template-columns: minmax(360px, 1fr) minmax(330px, 40vw);
+      }
+
+      .brand {
+        padding: 20px 20px 14px;
+      }
+
+      .controls {
+        padding: 14px;
+      }
+
+      .map-header {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        padding: 16px 18px;
+      }
+
+      .map-actions {
+        justify-content: flex-start;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .app {
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(0, 52dvh) minmax(0, 48dvh);
+        height: 100vh;
+        height: 100dvh;
+        min-height: 0;
+        overflow: hidden;
+      }
+
+      .brand {
+        padding: 14px 16px 10px;
+      }
+
+      .eyebrow {
+        margin-bottom: 4px;
+        font-size: 12px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+
+      .summary {
+        gap: 6px;
+        margin-top: 9px;
+        font-size: 12px;
+      }
+
+      .summary span {
+        min-height: 26px;
+        padding: 4px 9px;
+      }
+
+      .sidebar {
+        min-height: 0;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .controls {
+        padding: 10px 12px;
+      }
+
+      .search-input {
+        height: 38px;
+      }
+
+      .segments {
+        gap: 5px;
+        margin-top: 8px;
+      }
+
+      .ghost-button,
+      .segment-button,
+      .chip-button {
+        min-height: 32px;
+      }
+
+      .chips {
+        gap: 6px;
+        margin-top: 8px;
+      }
+
+      .results-meta {
+        padding: 8px 16px;
+      }
+
+      .map-pane {
+        height: 100%;
+        min-height: 0;
+      }
+
+      .map-header {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px;
+        padding: 12px 16px;
+      }
+
+      .map-actions {
+        justify-content: flex-end;
+      }
+
+      .selected-label {
+        margin-bottom: 2px;
+        font-size: 12px;
+      }
+
+      .selected-title {
+        font-size: 18px;
+      }
+
+      .selected-meta {
+        gap: 5px;
+        margin-top: 6px;
+      }
+
+      .list {
+        min-height: 0;
+        max-height: none;
+        padding-bottom: 14px;
+      }
+
+      iframe {
+        min-height: 0;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .app {
+        grid-template-rows: minmax(0, 52dvh) minmax(0, 48dvh);
+      }
+
+      .food-card {
+        padding: 11px;
+      }
+
+      .card-actions {
+        margin-top: 9px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .brand {
+        padding: 12px 14px 9px;
+      }
+
+      .controls {
+        padding: 9px 10px;
+      }
+
+      h1 {
+        font-size: 21px;
+      }
+
+      .search-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+      }
+
+      .map-header {
+        padding: 10px 14px;
+      }
+
+      .selected-title {
+        font-size: 17px;
+      }
+
+      .badge {
+        min-height: 22px;
+        padding: 2px 7px;
+        font-size: 11px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .app {
+        grid-template-rows: minmax(0, 50dvh) minmax(0, 50dvh);
+      }
+
+      .summary {
+        gap: 5px;
+      }
+
+      .summary span {
+        min-height: 24px;
+        padding: 3px 8px;
+      }
+
+      .search-input {
+        padding-inline: 10px;
+      }
+
+      .segment-button {
+        font-size: 12px;
+      }
+
+      .food-card {
+        padding: 10px;
+      }
+
+      .card-title {
+        font-size: 15px;
+      }
+
+      .note,
+      .card-link {
+        font-size: 12px;
+      }
+
+    }
+
+    @media (max-width: 980px) and (min-width: 700px) and (max-height: 560px) {
+      .app {
+        grid-template-columns: minmax(340px, 56vw) minmax(280px, 44vw);
+        grid-template-rows: 1fr;
+      }
+
+      .sidebar {
+        border-right: 1px solid var(--line);
+        border-bottom: 0;
+      }
+
+      .map-header {
+        padding: 10px 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="sidebar" aria-label="福岡必吃清單">
+      <header class="brand">
+        <p class="eyebrow">2026 春福旅行團 福岡</p>
+        <h1>福岡必吃地圖</h1>
+        <div class="summary" aria-label="清單摘要">
+          <span id="totalCount">0 家店</span>
+          <span>Google Maps</span>
+          <span>Notion 清單</span>
+        </div>
+      </header>
+
+      <section class="controls" aria-label="篩選">
+        <div class="search-row">
+          <input id="searchInput" class="search-input" type="search" placeholder="搜尋店名、類型、備註" autocomplete="off">
+          <button id="clearButton" class="ghost-button" type="button">清除</button>
+        </div>
+        <div class="segments" role="group" aria-label="Tier">
+          <button class="segment-button is-active" type="button" data-tier="all">全部</button>
+          <button class="segment-button" type="button" data-tier="Tier1">Tier1</button>
+          <button class="segment-button" type="button" data-tier="Tier2">Tier2</button>
+          <button class="segment-button" type="button" data-priority="true">紅字</button>
+        </div>
+        <div id="categoryChips" class="chips" aria-label="分類"></div>
+      </section>
+
+      <div class="results-meta">
+        <span id="resultCount">0 筆結果</span>
+        <span id="activeCategory">全部分類</span>
+      </div>
+
+      <section id="foodList" class="list" aria-live="polite"></section>
+    </section>
+
+    <section class="map-pane" aria-label="地圖預覽">
+      <header class="map-header">
+        <div>
+          <p class="selected-label">目前地點</p>
+          <h2 id="selectedTitle" class="selected-title">福岡美食</h2>
+          <div id="selectedMeta" class="selected-meta"></div>
+        </div>
+        <div class="map-actions">
+          <a id="openMapButton" class="map-button" href="https://www.google.com/maps/search/?api=1&query=%E7%A6%8F%E5%B2%A1%20%E7%BE%8E%E9%A3%9F" target="_blank" rel="noreferrer">Google Maps</a>
+        </div>
+      </header>
+      <div class="map-wrap">
+        <iframe id="mapFrame" title="Google Maps" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=%E7%A6%8F%E5%B2%A1%20%E5%8D%9A%E5%A4%9A%20%E5%A4%A9%E7%A5%9E%20%E7%BE%8E%E9%A3%9F&z=13&output=embed"></iframe>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const restaurants = [
+      { name: "Shin-Shin拉麵", tier: "Tier1", category: "拉麵", priority: true, note: "Notion 紅字；豚骨拉麵", query: "博多らーめん Shin Shin 福岡" },
+      { name: "小幸拉麵", tier: "Tier1", category: "拉麵", priority: true, note: "Notion 紅字；行程多次提及", query: "小幸ラーメン 福岡" },
+      { name: "博多川端 どさんこ 本店", tier: "Tier1", category: "拉麵", query: "博多川端 どさんこ 本店 福岡" },
+      { name: "長浜ナンバーワン", tier: "Tier1", category: "拉麵", query: "長浜ナンバーワン 福岡" },
+      { name: "博多一双", tier: "Tier1", category: "拉麵", query: "博多一双 福岡" },
+      { name: "札幌卡蘇拉麵和天婦羅風土", tier: "Tier1", category: "拉麵", query: "札幌 カスラーメン 天ぷら 風土 福岡" },
+      { name: "24小時平價拉麵 博多屋", tier: "Tier1", category: "拉麵", query: "博多屋 ラーメン 24時間 福岡" },
+      { name: "Tempura Takao", tier: "Tier1", category: "天婦羅", query: "博多天ぷら たかお 福岡" },
+      { name: "奉天本家", tier: "Tier1", category: "餃子", query: "奉天本家 福岡" },
+      { name: "中洲川端 きりん", tier: "Tier1", category: "餃子", note: "肉汁餃子", query: "中洲川端 きりん 餃子 福岡" },
+      { name: "うま馬", tier: "Tier1", category: "居酒屋", priority: true, note: "Notion 紅字；拉麵、雞皮、QR", query: "博多うま馬 福岡" },
+      { name: "竹乃屋", tier: "Tier1", category: "居酒屋", note: "綜合、QR", query: "竹乃屋 福岡" },
+      { name: "Ramen & Yakitori Kawanosoba", tier: "Tier1", category: "居酒屋", note: "拉麵、雞皮", query: "Ramen & Yakitori Kawanosoba 福岡" },
+      { name: "長浜屋台 やまちゃん", tier: "Tier1", category: "居酒屋", note: "綜合、QR", query: "長浜屋台 やまちゃん 福岡" },
+      { name: "煮こみ 中洲川端店", tier: "Tier1", category: "居酒屋", note: "綜合、QR", query: "煮こみ 中洲川端店 福岡" },
+      { name: "Hakata Osshoi", tier: "Tier1", category: "居酒屋", note: "綜合、QR", query: "Hakata Osshoi 福岡" },
+      { name: "信州蕎麥麵 Murata", tier: "Tier1", category: "蕎麥/烏龍", query: "信州そば むらた 福岡" },
+      { name: "みやけうどん", tier: "Tier1", category: "蕎麥/烏龍", query: "みやけうどん 福岡" },
+      { name: "釜喜利うどん", tier: "Tier1", category: "蕎麥/烏龍", query: "釜喜利うどん 福岡" },
+      { name: "Hakata seafood Uoden", tier: "Tier1", category: "蕎麥/烏龍", query: "Hakata seafood Uoden 福岡" },
+      { name: "喜水丸", tier: "Tier1", category: "海鮮", priority: true, note: "Notion 紅字", query: "喜水丸 福岡" },
+      { name: "呼子花枝 河太郎", tier: "Tier1", category: "海鮮", query: "河太郎 呼子 イカ 福岡" },
+      { name: "魚がし うお助", tier: "Tier1", category: "海鮮", query: "魚がし うお助 福岡" },
+      { name: "三陽食堂", tier: "Tier1", category: "海鮮", query: "三陽食堂 福岡" },
+      { name: "寿司 博多魚が", tier: "Tier1", category: "壽司", priority: true, note: "Notion 紅字", query: "寿司 博多魚が 福岡" },
+      { name: "玄海丸", tier: "Tier1", category: "壽司", priority: true, note: "Notion 紅字", query: "玄海丸 福岡" },
+      { name: "廻転寿司 冨士丸", tier: "Tier1", category: "壽司", query: "廻転寿司 冨士丸 福岡" },
+      { name: "極味屋", tier: "Tier1", category: "牛肉", priority: true, note: "Notion 紅字", query: "極味や 福岡" },
+      { name: "元村炸牛排", tier: "Tier1", category: "牛肉", priority: true, note: "Notion 紅字", query: "牛かつ もと村 福岡" },
+      { name: "Motsu-Bistro", tier: "Tier1", category: "牛肉", priority: true, note: "Notion 紅字", query: "モツビストロ 天神ホルモン 福岡" },
+      { name: "たんか 博多店", tier: "Tier1", category: "牛肉", query: "たんか 博多店 福岡" },
+      { name: "燒肉 大東園", tier: "Tier1", category: "牛肉", query: "大東園 福岡" },
+      { name: "焼肉長介", tier: "Tier1", category: "牛肉", priority: true, note: "Notion 紅字", query: "焼肉長介 福岡" },
+      { name: "伽哩本舗", tier: "Tier1", category: "咖哩", priority: true, note: "Notion 紅字", query: "伽哩本舗 福岡" },
+      { name: "Curry Nile", tier: "Tier1", category: "咖哩", query: "カレー ナイル 福岡" },
+      { name: "European style rice curry Ken's", tier: "Tier1", category: "咖哩", query: "欧風ライスカレー Ken's 福岡" },
+      { name: "巷子內排隊咖哩 Tiki", tier: "Tier1", category: "咖哩", note: "Notion 備註：開業時間很短", query: "Tiki カレー 福岡" },
+      { name: "GARAM咖哩", tier: "Tier1", category: "咖哩", query: "GARAM カレー 福岡" },
+      { name: "大名カレー 中村屋", tier: "Tier1", category: "咖哩", priority: true, note: "Notion 紅字", query: "大名カレー 中村屋 福岡" },
+      { name: "Quatchie Spice Yukuru", tier: "Tier1", category: "咖哩", query: "Quatchie Spice Yukuru 福岡" },
+      { name: "博多水炊鍋専門 橙", tier: "Tier1", category: "雞肉", priority: true, note: "Notion 紅字", query: "博多水炊き専門 橙 福岡" },
+      { name: "鳥鶏研究団", tier: "Tier1", category: "雞肉", priority: true, note: "Notion 紅字；拉麵、雞皮、QR", query: "鳥鶏研究団 福岡" },
+      { name: "新三浦", tier: "Tier1", category: "雞肉", priority: true, note: "Notion 紅字；水炊鍋", query: "新三浦 福岡" },
+      { name: "若葉豬排", tier: "Tier1", category: "豬排", query: "とんかつ わか葉 福岡" },
+      { name: "大名黑豚吉列豬扒", tier: "Tier1", category: "豬排", query: "大名 黒豚 とんかつ 福岡" },
+      { name: "Campbell Early", tier: "Tier1", category: "甜點/咖啡", query: "Campbell Early 福岡" },
+      { name: "green bean to bar CHOCOLATE", tier: "Tier1", category: "甜點/咖啡", query: "green bean to bar CHOCOLATE 福岡" },
+      { name: "彈塗魚燒 萬十", tier: "Tier1", category: "甜點/咖啡", query: "むっちゃん万十 福岡" },
+      { name: "APOC COFFEE", tier: "Tier1", category: "甜點/咖啡", query: "APOC COFFEE 福岡" },
+      { name: "White Glass Coffee", tier: "Tier1", category: "甜點/咖啡", query: "White Glass Coffee 福岡" },
+      { name: "フランス菓子16区", tier: "Tier1", category: "甜點/咖啡", query: "フランス菓子16区 福岡" },
+      { name: "Patisserie Georges Marceau", tier: "Tier1", category: "甜點/咖啡", query: "Patisserie Georges Marceau 福岡" },
+      { name: "Pain Stock", tier: "Tier1", category: "麵包", query: "Pain Stock 福岡" },
+      { name: "full full", tier: "Tier1", category: "麵包", query: "フルフル 福岡" },
+      { name: "BOUL'ANGE", tier: "Tier1", category: "麵包", query: "BOUL'ANGE 福岡" },
+      { name: "とりかわ大臣", tier: "Tier2", category: "雞皮/串燒", query: "とりかわ大臣 福岡" },
+      { name: "大砲拉麵", tier: "Tier2", category: "拉麵", query: "大砲ラーメン 福岡" },
+      { name: "かわ屋", tier: "Tier2", category: "雞皮/串燒", query: "かわ屋 福岡" },
+      { name: "天神內臟", tier: "Tier2", category: "牛肉", query: "天神ホルモン 福岡" },
+      { name: "トマトラーメン 三味", tier: "Tier2", category: "拉麵", query: "トマトラーメン 三味 福岡" },
+      { name: "餃子拉麵酒場 暖暮", tier: "Tier2", category: "拉麵", query: "餃子ラーメン酒場 暖暮 福岡" },
+      { name: "すし酒場さしす", tier: "Tier2", category: "壽司", query: "すし酒場さしす 福岡" },
+      { name: "地雞屋大和", tier: "Tier2", category: "雞肉", query: "地雞屋大和 福岡" },
+      { name: "ラーメン れんげ", tier: "Tier2", category: "拉麵", query: "ラーメン れんげ 福岡" },
+      { name: "パンデルソル", tier: "Tier2", category: "麵包", query: "パンデルソル 福岡" },
+      { name: "博多海鮮食堂 魚吉", tier: "Tier2", category: "海鮮", query: "博多海鮮食堂 魚吉 福岡" },
+      { name: "博多めんちゃんこ亭", tier: "Tier2", category: "拉麵", query: "博多めんちゃんこ亭 福岡" },
+      { name: "元祖 赤のれん 節ちゃん拉麵", tier: "Tier2", category: "拉麵", query: "元祖 赤のれん 節ちゃんラーメン 福岡" },
+      { name: "博多 ごまさば屋", tier: "Tier2", category: "海鮮", query: "博多 ごまさば屋 福岡" },
+      { name: "天麩羅処ひらお", tier: "Tier2", category: "天婦羅", query: "天麩羅処ひらお 福岡" },
+      { name: "黒豚とんかつ くろまつ", tier: "Tier2", category: "豬排", query: "黒豚とんかつ くろまつ 福岡" },
+      { name: "野菜巻き串と餃子 まきんしゃい", tier: "Tier2", category: "餃子", query: "野菜巻き串と餃子 まきんしゃい 福岡" },
+      { name: "長濱拉麵 屋台おかもと", tier: "Tier2", category: "拉麵", query: "長浜ラーメン 屋台おかもと 福岡" },
+      { name: "餃子食堂 宝雲亭", tier: "Tier2", category: "餃子", query: "餃子食堂 宝雲亭 福岡" },
+      { name: "麵屋兼虎", tier: "Tier2", category: "拉麵", query: "麺や兼虎 福岡" },
+      { name: "石蔵 DEITOS店", tier: "Tier2", category: "海鮮", query: "石蔵 DEITOS店 福岡" },
+      { name: "魚好亭", tier: "Tier2", category: "海鮮", query: "魚好亭 福岡" },
+      { name: "Yakiniku no Bakuro", tier: "Tier2", category: "牛肉", query: "Yakiniku no Bakuro 福岡" },
+      { name: "王餃子", tier: "Tier2", category: "餃子", query: "王餃子 福岡" },
+      { name: "麺屋 一矢", tier: "Tier2", category: "拉麵", query: "麺屋 一矢 福岡" },
+      { name: "博多藪", tier: "Tier2", category: "蕎麥/烏龍", query: "博多藪 福岡" },
+      { name: "ラーメン海鳴", tier: "Tier2", category: "拉麵", query: "ラーメン海鳴 福岡" },
+      { name: "博多 海亭", tier: "Tier2", category: "海鮮", query: "博多 海亭 福岡" },
+      { name: "小野の離れ", tier: "Tier2", category: "海鮮", query: "小野の離れ 福岡" },
+      { name: "幸陽丸", tier: "Tier2", category: "海鮮", query: "幸陽丸 福岡" },
+      { name: "博多石焼 大阪屋", tier: "Tier2", category: "居酒屋", query: "博多石焼 大阪屋 福岡" },
+      { name: "鮪魚料理 紀文", tier: "Tier2", category: "海鮮", query: "鮪魚料理 紀文 福岡" },
+      { name: "鈴懸本店", tier: "Tier2", category: "甜點/咖啡", query: "鈴懸本店 福岡" },
+      { name: "博多鉄板焼 まんぷく亭", tier: "Tier2", category: "居酒屋", query: "博多鉄板焼 まんぷく亭 福岡" },
+      { name: "アキラ水産", tier: "Tier2", category: "海鮮", query: "アキラ水産 福岡" },
+      { name: "博多せいもん払い", tier: "Tier2", category: "海鮮", query: "博多せいもん払い 福岡" },
+      { name: "弥太郎うどん", tier: "Tier2", category: "蕎麥/烏龍", query: "弥太郎うどん 福岡" },
+      { name: "天神たんか", tier: "Tier2", category: "牛肉", query: "天神たんか 福岡" },
+      { name: "肉汁餃子のダンダダン", tier: "Tier2", category: "餃子", query: "肉汁餃子のダンダダン 福岡" },
+      { name: "魚忠", tier: "Tier2", category: "海鮮", query: "魚忠 福岡" },
+      { name: "煎餃 鐵木真", tier: "Tier2", category: "餃子", query: "煎餃 鐵木真 福岡" },
+      { name: "三味(333)", tier: "Tier2", category: "拉麵", query: "三味 333 福岡" },
+      { name: "Lion Shokudo", tier: "Tier2", category: "居酒屋", query: "Lion Shokudo 福岡" },
+      { name: "皮焼焼鳥 サンバ", tier: "Tier2", category: "雞皮/串燒", query: "皮焼焼鳥 サンバ 福岡" },
+      { name: "PRINCE of the FRUIT", tier: "Tier2", category: "甜點/咖啡", query: "PRINCE of the FRUIT 福岡" },
+      { name: "茶舗ふりゅう", tier: "Tier2", category: "甜點/咖啡", query: "茶舗ふりゅう 福岡" },
+      { name: "カクウチFUKUTARO", tier: "Tier2", category: "居酒屋", query: "カクウチFUKUTARO 福岡" },
+      { name: "鳥料理よし川食堂", tier: "Tier2", category: "雞肉", query: "鳥料理よし川食堂 福岡" },
+      { name: "ぎょらん亭", tier: "Tier2", category: "拉麵", query: "ぎょらん亭 福岡" }
+    ];
+
+    const state = {
+      tier: "all",
+      category: "all",
+      priorityOnly: false,
+      search: "",
+      activeId: 0
+    };
+    const MAP_ZOOM = 15;
+
+    restaurants.forEach((item, index) => {
+      item.id = index;
+    });
+
+    const elements = {
+      list: document.getElementById("foodList"),
+      search: document.getElementById("searchInput"),
+      clear: document.getElementById("clearButton"),
+      resultCount: document.getElementById("resultCount"),
+      totalCount: document.getElementById("totalCount"),
+      activeCategory: document.getElementById("activeCategory"),
+      categoryChips: document.getElementById("categoryChips"),
+      selectedTitle: document.getElementById("selectedTitle"),
+      selectedMeta: document.getElementById("selectedMeta"),
+      openMapButton: document.getElementById("openMapButton"),
+      mapFrame: document.getElementById("mapFrame")
+    };
+
+    const categories = ["all", ...Array.from(new Set(restaurants.map((item) => item.category))).sort((a, b) => a.localeCompare(b, "zh-Hant"))];
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function getQuery(item) {
+      return item.query || `${item.name} 福岡`;
+    }
+
+    function getMapUrl(item) {
+      return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(getQuery(item))}`;
+    }
+
+    function getEmbedUrl(item) {
+      return `https://www.google.com/maps?q=${encodeURIComponent(getQuery(item))}&z=${MAP_ZOOM}&output=embed`;
+    }
+
+    function getFilteredItems() {
+      const term = state.search.trim().toLocaleLowerCase("zh-Hant");
+      return restaurants.filter((item) => {
+        const tierMatch = state.tier === "all" || item.tier === state.tier;
+        const categoryMatch = state.category === "all" || item.category === state.category;
+        const priorityMatch = !state.priorityOnly || item.priority;
+        const searchTarget = [item.name, item.category, item.tier, item.note, item.query].filter(Boolean).join(" ").toLocaleLowerCase("zh-Hant");
+        const searchMatch = !term || searchTarget.includes(term);
+        return tierMatch && categoryMatch && priorityMatch && searchMatch;
+      });
+    }
+
+    function renderCategories() {
+      elements.categoryChips.innerHTML = categories.map((category) => {
+        const label = category === "all" ? "全部分類" : category;
+        const active = state.category === category ? " is-active" : "";
+        return `<button class="chip-button${active}" type="button" data-category="${escapeHtml(category)}">${escapeHtml(label)}</button>`;
+      }).join("");
+    }
+
+    function renderCards() {
+      const items = getFilteredItems();
+      elements.resultCount.textContent = `${items.length} 筆結果`;
+      elements.activeCategory.textContent = state.category === "all" ? "全部分類" : state.category;
+
+      if (!items.length) {
+        elements.list.innerHTML = `<div class="empty-state">沒有符合的店家</div>`;
+        return;
+      }
+
+      if (!items.some((item) => item.id === state.activeId)) {
+        state.activeId = items[0].id;
+        renderSelected(items[0], true);
+      }
+
+      elements.list.innerHTML = items.map((item) => {
+        const active = item.id === state.activeId ? " is-active" : "";
+        const hotBadge = item.priority ? `<span class="badge hot">紅字</span>` : "";
+        const note = item.note ? `<p class="note">${escapeHtml(item.note)}</p>` : "";
+        return `
+          <article class="food-card${active}" data-id="${item.id}" tabindex="0" role="button" aria-label="${escapeHtml(item.name)}">
+            <div class="card-top">
+              <h3 class="card-title">${escapeHtml(item.name)}</h3>
+            </div>
+            <div class="badges">
+              <span class="badge ${item.tier === "Tier1" ? "tier1" : "tier2"}">${item.tier}</span>
+              <span class="badge">${escapeHtml(item.category)}</span>
+              ${hotBadge}
+            </div>
+            ${note}
+            <div class="card-actions">
+              <a class="card-link" href="${getMapUrl(item)}" target="_blank" rel="noreferrer">Google Maps</a>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderSelected(item, skipListRender = false) {
+      if (!item) return;
+      state.activeId = item.id;
+      elements.selectedTitle.textContent = item.name;
+      elements.selectedMeta.innerHTML = `
+        <span class="badge ${item.tier === "Tier1" ? "tier1" : "tier2"}">${item.tier}</span>
+        <span class="badge">${escapeHtml(item.category)}</span>
+        ${item.priority ? `<span class="badge hot">紅字</span>` : ""}
+      `;
+      elements.openMapButton.href = getMapUrl(item);
+      elements.mapFrame.src = getEmbedUrl(item);
+      if (!skipListRender) {
+        renderCards();
+      }
+    }
+
+    function syncSegmentButtons() {
+      document.querySelectorAll("[data-tier]").forEach((button) => {
+        button.classList.toggle("is-active", button.dataset.tier === state.tier);
+      });
+      document.querySelector("[data-priority]").classList.toggle("is-active", state.priorityOnly);
+    }
+
+    function render() {
+      renderCategories();
+      syncSegmentButtons();
+      renderCards();
+    }
+
+    elements.totalCount.textContent = `${restaurants.length} 家店`;
+
+    elements.search.addEventListener("input", (event) => {
+      state.search = event.target.value;
+      renderCards();
+    });
+
+    elements.clear.addEventListener("click", () => {
+      state.search = "";
+      elements.search.value = "";
+      renderCards();
+      elements.search.focus();
+    });
+
+    document.querySelectorAll("[data-tier]").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.tier = button.dataset.tier;
+        render();
+      });
+    });
+
+    document.querySelector("[data-priority]").addEventListener("click", () => {
+      state.priorityOnly = !state.priorityOnly;
+      render();
+    });
+
+    elements.categoryChips.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-category]");
+      if (!button) return;
+      state.category = button.dataset.category;
+      render();
+    });
+
+    elements.list.addEventListener("click", (event) => {
+      const link = event.target.closest("a");
+      if (link) return;
+      const card = event.target.closest("[data-id]");
+      if (!card) return;
+      renderSelected(restaurants[Number(card.dataset.id)]);
+    });
+
+    elements.list.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      const card = event.target.closest("[data-id]");
+      if (!card) return;
+      event.preventDefault();
+      renderSelected(restaurants[Number(card.dataset.id)]);
+    });
+
+    renderSelected(restaurants[0], true);
+    render();
+  </script>
+</body>
+</html>
